@@ -18,7 +18,8 @@ if (!existsSync(skillMdPath)) {
   process.exit(1)
 }
 
-const skillContent = readFileSync(skillMdPath, 'utf-8')
+// 读取并归一化换行（CRLF → LF），避免 Windows 检出后 frontmatter 正则失配
+const skillContent = readFileSync(skillMdPath, 'utf-8').replace(/\r\n/g, '\n')
 
 // 提取 references 引用
 const referencePattern = /references\/([\w-]+\.md)/g

@@ -39,13 +39,13 @@ jobs:
         working-directory: packages/mcp-server
 
       - name: Check license
-        run: node node_modules/tsx/dist/cli.mjs scripts/check-license.ts
+        run: node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-license.ts
 
       - name: Check tools
-        run: node node_modules/tsx/dist/cli.mjs scripts/check-tools.ts
+        run: node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-tools.ts
 
       - name: Check no-shell
-        run: node node_modules/tsx/dist/cli.mjs scripts/check-no-shell.ts
+        run: node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-no-shell.ts
 
       - name: Check skill refs
-        run: node node_modules/tsx/dist/cli.mjs scripts/check-skill-refs.ts
+        run: node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-skill-refs.ts

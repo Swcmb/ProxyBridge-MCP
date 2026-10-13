@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: packages/mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: packages/mcp-server
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+        working-directory: packages/mcp-server
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: packages/mcp-server
+
+      - name: Check license
+        run: npx tsx ../scripts/check-license.ts
+
+      - name: Check tools
+        run: npx tsx ../scripts/check-tools.ts
+
+      - name: Check no-shell
+        run: npx tsx ../scripts/check-no-shell.ts
+
+      - name: Check skill refs
+        run: npx tsx ../scripts/check-skill-refs.ts

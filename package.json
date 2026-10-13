@@ -1,0 +1,18 @@
+{
+  "name": "proxybridge-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "MCP Server for ProxyBridge CLI",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build": "npm --prefix packages/mcp-server run build",
+    "start": "node packages/mcp-server/dist/index.js",
+    "test": "npm --prefix packages/mcp-server run test",
+    "lint": "npm --prefix packages/mcp-server run lint",
+    "bench:startup": "tsx scripts/bench-startup.ts",
+    "check:license": "tsx scripts/check-license.ts",
+    "check:tools": "tsx scripts/check-tools.ts",
+    "check:no-shell": "tsx scripts/check-no-shell.ts",
+    "check:skill-refs": "tsx scripts/check-skill-refs.ts"
+  }
+}

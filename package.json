@@ -9,10 +9,10 @@
     "start": "node packages/mcp-server/dist/index.js",
     "test": "npm --prefix packages/mcp-server run test",
     "lint": "npm --prefix packages/mcp-server run lint",
-    "bench:startup": "tsx scripts/bench-startup.ts",
-    "check:license": "tsx scripts/check-license.ts",
-    "check:tools": "tsx scripts/check-tools.ts",
-    "check:no-shell": "tsx scripts/check-no-shell.ts",
-    "check:skill-refs": "tsx scripts/check-skill-refs.ts"
+    "bench:startup": "node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/bench-startup.ts",
+    "check:license": "node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-license.ts",
+    "check:tools": "node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-tools.ts",
+    "check:no-shell": "node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-no-shell.ts",
+    "check:skill-refs": "node packages/mcp-server/node_modules/tsx/dist/cli.mjs scripts/check-skill-refs.ts"
   }
 }

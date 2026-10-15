@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // ProxyBridge MCP Server — 进程生命周期管理（FR-12~FR-17）
 
-import { spawn, execSync, type ChildProcess } from 'node:child_process'
+import { spawn, execFileSync, type ChildProcess } from 'node:child_process'
 import { dirname } from 'node:path'
 import { ringBuffer } from './logbuffer.js'
 import { type ManagedProcess, type LogLine } from '../types.js'
 import { toolError } from '../errors.js'
 
-// 包装 execSync 以绕过 TypeScript 严格的 shell 选项类型检查
+// argv 以数组传入 execFileSync，shell:false，禁字符串拼接（NFR-14）
 function runExecSync(cmd: string, args: string[]): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  execSync(cmd, [...args] as any)
+  execFileSync(cmd, args, {
+    shell: false,
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'ignore'],
+  } as any)
 }
 
 export interface SupervisorState {
@@ -165,14 +168,15 @@ class Supervisor {
         }
       }
 
-      // 等待进程退出
+      // 等待进程退出。以 close 事件驱动的 state.child 归空为唯一判据：
+      // child.killed 只表示 kill() 已发出，不等于进程已终止（FR-17 同源）。
       return new Promise<{ stopped: boolean; exitCode?: number; durationMs?: number; method: string; note?: string }>((resolve) => {
         const checkInterval = setInterval(() => {
           const elapsed = Date.now() - startTime
           if (elapsed >= timeoutMs) {
             clearInterval(checkInterval)
             resolve({ stopped: false, durationMs: elapsed, method: 'taskkill-tree', note: 'TIMEOUT' })
-          } else if (!this.state.child || this.state.child.killed) {
+          } else if (this.state.child === null) {
             clearInterval(checkInterval)
             const exitCode = this.state.process?.lastExit?.exitCode ?? undefined
             resolve({ stopped: true, exitCode, durationMs: elapsed, method: 'taskkill-tree' })

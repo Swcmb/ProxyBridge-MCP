@@ -96,6 +96,30 @@ earlier true-ready instant. The observed ~3 s figure corroborates D-7's rational
 `ProxyBridgeCore.dll` load plus WinDivert initialization) and sits well above the 500 ms threshold, so
 no D-7 revision record is required and Q-5 closes with this host's measurement.
 
+### GUI export fixture (AC-18)
+
+`test/fixtures/gui-export.pbprofile` is a genuine GUI export, produced by loading a profile into
+`ProxyBridge.exe` (Profile → Import) and writing it back out (Profile → Export). No credentials are
+present in the fixture.
+
+`proxybridge_read_profile` returns the structured profile; `proxybridge_validate_profile` accepts
+it with `valid: true` and only the six expected `RULE_OVERRIDDEN_BY_FORCED_DIRECT` FR-9 warnings —
+no `PROFILE_UNKNOWN_FIELD` errors. The D-9 strictness (top-level unknown = error, nested unknown =
+warning) needs no recalibration: the GUI's own field set validates cleanly.
+
+Two schema facts this fixture pins down, both now reflected in `src/types.ts`:
+
+| Field | Observed GUI value | Note |
+| --- | --- | --- |
+| `ProxyConfigs[].Id` | `"p1"` — a **string** | Types were `number`; corrected to `string` |
+| `ProxyRules[].ProxyConfigId` | `"p1"` — a **string** | Same correction |
+
+Running the validator against this file also surfaced a real defect, now fixed: the
+`proxybridge_validate_profile` `path` branch fed the raw on-disk (PascalCase) JSON straight into
+`validateProfile`, which expects the camelCase request shape, so any file-based validation crashed
+with a `TypeError`. `build.ts` now exposes `toProfileRequest` to map the on-disk shape first, and
+the validator is reachable for every file the CLI or GUI can produce.
+
 ## License
 
 GPL-3.0-or-later. See `COPYING` for full text.

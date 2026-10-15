@@ -89,10 +89,12 @@ Full `start → status → logs → stop` cycle exercised against the real CLI a
   `RUNNING` — expected for a stoppable kernel driver that survives process exit; `ProxyBridgeSvc.exe`
   is a separate always-on Windows service, unrelated to the spawned CLI.
 
-The admin-required CLI run reveals a real startup-timing observation: `start` returns as soon as the
-process is spawned plus the readiness window, so `readyMs` reflects the configured
-`readyTimeoutMs` unless the CLI signals readiness earlier. Acceptance for this host is
-administrator-run as recorded above.
+The admin-required CLI run confirms AC-8 round three. Under the default `readyTimeoutMs` (3000 ms,
+`verbose: 1`), `start` reported `readyMs: 3009 ms` — the window is consumed in full because the CLI
+emits no machine-readable readiness signal, so `readyMs` tracks the configured window rather than an
+earlier true-ready instant. The observed ~3 s figure corroborates D-7's rationale (NativeAOT
+`ProxyBridgeCore.dll` load plus WinDivert initialization) and sits well above the 500 ms threshold, so
+no D-7 revision record is required and Q-5 closes with this host's measurement.
 
 ## License
 

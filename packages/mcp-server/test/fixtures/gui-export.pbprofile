@@ -1,0 +1,34 @@
+{
+  "Version": "1.0",
+  "LocalhostViaProxy": false,
+  "IsTrafficLoggingEnabled": true,
+  "ProxyConfigs": [
+    {
+      "Id": "p1",
+      "Type": "http",
+      "Host": "127.0.0.1",
+      "Port": "8080"
+    },
+    {
+      "Id": "p2",
+      "Type": "socks5",
+      "Host": "127.0.0.1",
+      "Port": "1080"
+    }
+  ],
+  "ProxyRules": [
+    {
+      "ProcessName": "chrome.exe",
+      "Protocol": "TCP",
+      "Action": "PROXY",
+      "IsEnabled": true,
+      "ProxyConfigId": "p1"
+    },
+    {
+      "ProcessName": "notepad.exe",
+      "Protocol": "TCP",
+      "Action": "DIRECT",
+      "IsEnabled": true
+    }
+  ]
+}

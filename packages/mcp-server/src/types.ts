@@ -2,8 +2,9 @@
 // ProxyBridge MCP Server — 类型定义
 
 // Profile 数据模型（请求层）
+// 真实 GUI 导出的代理 Id 为字符串（如 "p1"），见 AC-18 校准
 export interface ProxyConfigRequest {
-  id: number
+  id: string
   type: 'socks5' | 'http'
   host: string
   port: number | string
@@ -18,7 +19,7 @@ export interface RuleRequest {
   protocol: 'TCP' | 'UDP' | 'BOTH'
   action: 'DIRECT' | 'BLOCK' | 'PROXY'
   isEnabled?: boolean
-  proxyConfigId?: number
+  proxyConfigId?: string
 }
 
 export interface ProfileRequest {
@@ -30,8 +31,9 @@ export interface ProfileRequest {
 }
 
 // Profile 数据模型（落盘 JSON）
+// Id 为字符串（如 "p1"），见 AC-18 校准
 export interface ProxyConfig {
-  Id: number
+  Id: string
   Type: 'socks5' | 'http'
   Host: string
   Port: string
@@ -46,7 +48,7 @@ export interface ProxyRule {
   Protocol: 'TCP' | 'UDP' | 'BOTH'
   Action: 'DIRECT' | 'BLOCK' | 'PROXY'
   IsEnabled?: boolean
-  ProxyConfigId?: number
+  ProxyConfigId?: string
 }
 
 export interface ProfileData {

@@ -40,3 +40,34 @@ export function buildProfile(request: ProfileRequest): ProfileData {
 
   return data
 }
+
+/**
+ * 落盘 ProfileData（PascalCase）→ 校验入参 ProfileRequest（camelCase）
+ * 供 proxybridge_validate_profile 的 path 分支使用（FR-11/AC-18）
+ */
+export function toProfileRequest(data: Partial<ProfileData>): ProfileRequest {
+  const proxies = Array.isArray(data.ProxyConfigs) ? data.ProxyConfigs : []
+  const rules = Array.isArray(data.ProxyRules) ? data.ProxyRules : []
+  return {
+    version: String((data as any).Version ?? ''),
+    localhostViaProxy: data.LocalhostViaProxy,
+    trafficLogging: data.IsTrafficLoggingEnabled,
+    proxies: proxies.map(p => ({
+      id: String((p as any).Id ?? ''),
+      type: p.Type,
+      host: p.Host,
+      port: p.Port,
+      username: p.Username,
+      password: p.Password,
+    })),
+    rules: rules.map(r => ({
+      processName: r.ProcessName,
+      targetHosts: r.TargetHosts,
+      targetPorts: r.TargetPorts,
+      protocol: r.Protocol,
+      action: r.Action,
+      isEnabled: r.IsEnabled,
+      proxyConfigId: r.ProxyConfigId !== undefined ? String(r.ProxyConfigId) : undefined,
+    })),
+  }
+}

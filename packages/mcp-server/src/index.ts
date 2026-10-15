@@ -9,7 +9,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import { supervisor } from './process/supervisor.js'
 import { validateProfile } from './profile/validate.js'
-import { buildProfile } from './profile/build.js'
+import { buildProfile, toProfileRequest } from './profile/build.js'
 import { readProfile } from './profile/read.js'
 import { probeProxy } from './net/probe.js'
 import { locateCli } from './cli/locate.js'
@@ -283,11 +283,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'proxybridge_validate_profile': {
         if (args?.['path']) {
-          // 从文件读取
+          // 从文件读取：落盘 PascalCase → 校验入参 camelCase（AC-18）
           try {
             const content = readFileSync(args['path'] as string, 'utf-8')
             const parsed = JSON.parse(content)
-            return { content: [{ type: 'text', text: JSON.stringify(validateProfile(parsed), null, 2) }] }
+            return { content: [{ type: 'text', text: JSON.stringify(validateProfile(toProfileRequest(parsed)), null, 2) }] }
           } catch (err) {
             if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
               throw toolError('PROFILE_NOT_FOUND', `文件不存在：${args['path']}`, '用 proxybridge_list_profiles 查看现有 profile', null)

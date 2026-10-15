@@ -80,7 +80,7 @@ function validateProxies(proxies: ProxyConfigRequest[]): ValidationSubResult {
     errors.push(validationError('PROXY_LIMIT_EXCEEDED', `代理配置数 ${proxies.length} 超过上限 16`, 'ProxyConfigs'))
   }
 
-  const ids = new Set<number>()
+  const ids = new Set<string>()
 
   for (let i = 0; i < proxies.length; i++) {
     const proxy = proxies[i]

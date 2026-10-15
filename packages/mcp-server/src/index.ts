@@ -11,6 +11,7 @@ import { supervisor } from './process/supervisor.js'
 import { validateProfile } from './profile/validate.js'
 import { buildProfile, toProfileRequest } from './profile/build.js'
 import { readProfile } from './profile/read.js'
+import { isSafeFilename } from './profile/paths.js'
 import { probeProxy } from './net/probe.js'
 import { locateCli } from './cli/locate.js'
 import { checkAdmin } from './cli/admin.js'
@@ -469,13 +470,6 @@ function getBaseDir(dir?: string): string {
     mkdirSync(defaultDir, { recursive: true })
   }
   return defaultDir
-}
-
-function isSafeFilename(filename: string): boolean {
-  if (filename.includes('/') || filename.includes('\\') || filename.includes('..') || filename.startsWith('/')) {
-    return false
-  }
-  return true
 }
 
 async function main() {

@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: packages/mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: packages/mcp-server
+
+      - name: Build
+        run: npm run build
+        working-directory: packages/mcp-server
+
+      - name: Run tests
+        run: npm test
+        working-directory: packages/mcp-server
+
+      - name: Package artifact
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $name = "proxybridge-mcp-server-$version-win-x64.zip"
+
+          # 打包：构建产物 + 依赖清单 + 源码，使用者本地 npm install 即可运行
+          # 排除 sourcemap（.js.map）以减小体积
+          $tmp = "dist-package"
+          New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+          Copy-Item -Recurse -Path "packages/mcp-server/dist" -Destination "$tmp/dist"
+          Get-ChildItem -Recurse -Path "$tmp/dist" -Filter *.js.map | Remove-Item
+          Copy-Item -Path "packages/mcp-server/package.json" -Destination "$tmp/package.json"
+          Copy-Item -Path "packages/mcp-server/package-lock.json" -Destination "$tmp/package-lock.json"
+          Copy-Item -Path "packages/mcp-server/README.md" -Destination "$tmp/README.md"
+          Copy-Item -Recurse -Path "packages/mcp-server/src" -Destination "$tmp/src"
+
+          Compress-Archive -Path "$tmp/*" -DestinationPath $name
+          Write-Host "Created $name"
+          Get-Item $name | Select-Object Name, Length
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            proxybridge-mcp-server-*.zip
+          generate_release_notes: false
+          draft: false
+          prerelease: false
